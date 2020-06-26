@@ -6,6 +6,7 @@ from data_aug.gaussian_blur import GaussianBlur
 from torchvision import datasets
 from torch.utils.data.dataset import Dataset
 import pandas as pd
+import torch
 import cv2
 
 np.random.seed(0)
@@ -27,8 +28,7 @@ class DataSetWrapper(object):
             train_dataset = datasets.STL10('./data', split='train+unlabeled', download=True,
                                            transform=SimCLRDataTransform(data_augment))
         else:
-            train_dataset = SimpleDataset(data_csv,
-                                          SimCLRDataTransform(data_augment))
+            train_dataset = SimpleDataset(data_csv)
 
         train_loader, valid_loader = self.get_train_validation_data_loaders(train_dataset)
         return train_loader, valid_loader
@@ -88,7 +88,9 @@ class SimpleDataset(Dataset):
         Assuming images are in image_url
         """
         sample = cv2.imread(self.data[idx]['img_path'])
-        if self.transform:
-            sample = transforms(sample)
+        sample = cv2.resize(sample, (224, 224)) / 255.0
+        sample = np.asarray(sample, dtype=np.float32)
+        sample = sample.transpose(2, 0, 1)
+        sample = torch.tensor(sample)
 
         return sample
