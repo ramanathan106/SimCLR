@@ -7,6 +7,7 @@ from torchvision import datasets
 from torch.utils.data.dataset import Dataset
 from PIL import Image, ImageFile
 import pandas as pd
+from data_aug.image_downloader import download_df_lis
 from PIL import Image
 import os
 from tqdm import tqdm
@@ -25,14 +26,14 @@ class DataSetWrapper(object):
         self.s = s
         self.input_shape = eval(input_shape)
 
-    def get_data_loaders(self, data_csv=None):
+    def get_data_loaders(self, data_csv=None, type=None, image_folder=None):
         data_augment = self._get_simclr_pipeline_transform()
 
         if not data_csv:
             train_dataset = datasets.STL10('./data', split='train+unlabeled', download=True,
                                            transform=SimCLRDataTransform(data_augment))
         else:
-            train_dataset = SimpleDataset(data_csv, transforms=SimCLRDataTransform(data_augment))
+            train_dataset = SimpleDataset(data_csv, type, image_folder, transforms=SimCLRDataTransform(data_augment))
 
         train_loader, valid_loader = self.get_train_validation_data_loaders(train_dataset)
         return train_loader, valid_loader
@@ -80,10 +81,13 @@ class SimCLRDataTransform(object):
 
 
 class SimpleDataset(Dataset):
-    def __init__(self, csv_file, transforms=None):
+    def __init__(self, csv_file, type, image_folder, transforms=None):
         self.column = "img_path"
 
         self.data = pd.read_csv(csv_file).to_dict("records")
+
+        if type == "image_url":
+            self.data = download_df_lis(self.data, image_folder)
 
         # file exist
         self.data = [n for n in tqdm(self.data) if check_image(n[self.column])]
