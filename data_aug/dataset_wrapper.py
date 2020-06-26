@@ -5,12 +5,15 @@ import torchvision.transforms as transforms
 from data_aug.gaussian_blur import GaussianBlur
 from torchvision import datasets
 from torch.utils.data.dataset import Dataset
+from PIL import Image, ImageFile
 import pandas as pd
 from PIL import Image
-import torch
-import cv2
+import os
+from tqdm import tqdm
+
 
 np.random.seed(0)
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class DataSetWrapper(object):
@@ -78,7 +81,12 @@ class SimCLRDataTransform(object):
 
 class SimpleDataset(Dataset):
     def __init__(self, csv_file, transforms=None):
+        self.column = "img_path"
+
         self.data = pd.read_csv(csv_file).to_dict("records")
+
+        # file exist
+        self.data = [n for n in tqdm(self.data) if check_image(n[self.column])]
         self.transforms = transforms
 
     def __len__(self):
@@ -96,3 +104,15 @@ class SimpleDataset(Dataset):
         sample = self.transforms(sample)
 
         return sample, None
+
+
+def check_image(img):
+    try:
+        img = Image.open(img)
+        temp = img.size
+        if temp[0] > 0 and temp[1] > 0:
+            return True
+        else:
+            raise Exception("error")
+    except:
+        return False
