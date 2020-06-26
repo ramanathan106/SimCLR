@@ -103,7 +103,7 @@ class SimpleDataset(Dataset):
         # sample = np.asarray(sample, dtype=np.float32)
         sample = self.transforms(sample)
 
-        return sample, None
+        return sample, "1"
 
 
 def check_image(img):
