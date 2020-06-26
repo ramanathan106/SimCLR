@@ -58,8 +58,8 @@ class SimCLR(object):
         return loss
 
     def train(self):
-
-        train_loader, valid_loader = self.dataset.get_data_loaders()
+        sample_data = "/mnt/workhorse/cv/ram/dev_mode/train_conv/train_conv/sample_data/sample_image_data.csv"
+        train_loader, valid_loader = self.dataset.get_data_loaders(sample_data)
 
         model = ResNetSimCLR(**self.config["model"]).to(self.device)
         model = self._load_pre_trained_weights(model)

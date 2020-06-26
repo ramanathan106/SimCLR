@@ -4,6 +4,8 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import torchvision.transforms as transforms
 from data_aug.gaussian_blur import GaussianBlur
 from torchvision import datasets
+import pandas as pd
+import cv2
 
 np.random.seed(0)
 
@@ -17,11 +19,15 @@ class DataSetWrapper(object):
         self.s = s
         self.input_shape = eval(input_shape)
 
-    def get_data_loaders(self):
+    def get_data_loaders(self, data_csv=None):
         data_augment = self._get_simclr_pipeline_transform()
 
-        train_dataset = datasets.STL10('./data', split='train+unlabeled', download=True,
-                                       transform=SimCLRDataTransform(data_augment))
+        if not data_csv:
+            train_dataset = datasets.STL10('./data', split='train+unlabeled', download=True,
+                                           transform=SimCLRDataTransform(data_augment))
+        else:
+            train_dataset = SimpleDataset(data_csv,
+                                          SimCLRDataTransform(data_augment))
 
         train_loader, valid_loader = self.get_train_validation_data_loaders(train_dataset)
         return train_loader, valid_loader
@@ -66,3 +72,22 @@ class SimCLRDataTransform(object):
         xi = self.transform(sample)
         xj = self.transform(sample)
         return xi, xj
+
+
+class SimpleDataset(object):
+    def __init__(self, csv_file, transform=None):
+        self.data = pd.read_csv(csv_file).to_dict("records")
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        """
+        Assuming images are in image_url
+        """
+        sample = cv2.imread(self.data[idx]['image_url'])
+        if self.transform:
+            sample = transforms(sample)
+
+        return sample
