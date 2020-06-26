@@ -89,6 +89,7 @@ class SimpleDataset(Dataset):
         Assuming images are in image_url
         """
         sample = Image.open(self.data[idx]['img_path'])
+        sample = sample.resize((224, 224))
         # sample = cv2.imread(self.data[idx]['img_path'])
         # sample = cv2.resize(sample, (224, 224)) / 255.0
         # sample = np.asarray(sample, dtype=np.float32)
