@@ -4,6 +4,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import torchvision.transforms as transforms
 from data_aug.gaussian_blur import GaussianBlur
 from torchvision import datasets
+from torch.utils.data.dataset import Dataset
 import pandas as pd
 import cv2
 
@@ -74,7 +75,7 @@ class SimCLRDataTransform(object):
         return xi, xj
 
 
-class SimpleDataset(object):
+class SimpleDataset(Dataset):
     def __init__(self, csv_file, transform=None):
         self.data = pd.read_csv(csv_file).to_dict("records")
         self.transform = transform
