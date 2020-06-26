@@ -77,9 +77,9 @@ class SimCLRDataTransform(object):
 
 
 class SimpleDataset(Dataset):
-    def __init__(self, csv_file, transform=None):
+    def __init__(self, csv_file, transforms=None):
         self.data = pd.read_csv(csv_file).to_dict("records")
-        self.transform = transform
+        self.transforms = transforms
 
     def __len__(self):
         return len(self.data)
@@ -93,6 +93,6 @@ class SimpleDataset(Dataset):
         # sample = cv2.imread(self.data[idx]['img_path'])
         # sample = cv2.resize(sample, (224, 224)) / 255.0
         # sample = np.asarray(sample, dtype=np.float32)
-        sample = self.transform(sample)
+        sample = self.transforms(sample)
 
         return sample, None
