@@ -4,7 +4,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import torchvision.transforms as transforms
 from data_aug.gaussian_blur import GaussianBlur
 from torchvision import datasets
-from torchvision.datasets.vision import VisionDataset
+from torch.utils.data.dataset import Dataset
 import pandas as pd
 import cv2
 
@@ -75,7 +75,7 @@ class SimCLRDataTransform(object):
         return xi, xj
 
 
-class SimpleDataset(VisionDataset):
+class SimpleDataset(Dataset):
     def __init__(self, csv_file, transform=None):
         self.data = pd.read_csv(csv_file).to_dict("records")
         self.transform = transform
@@ -87,7 +87,7 @@ class SimpleDataset(VisionDataset):
         """
         Assuming images are in image_url
         """
-        sample = cv2.imread(self.data[idx]['image_url'])
+        sample = cv2.imread(self.data[idx]['img_path'])
         if self.transform:
             sample = transforms(sample)
 
