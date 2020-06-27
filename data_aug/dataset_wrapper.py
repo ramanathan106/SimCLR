@@ -14,6 +14,13 @@ np.random.seed(0)
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
+def check_for_kernelsize(ksize):
+    if ksize % 2 == 1:
+        return ksize
+    else:
+        return ksize + 1
+
+
 class DataSetWrapper(object):
 
     def __init__(self, batch_size, num_workers, valid_size, input_shape, s):
@@ -42,7 +49,7 @@ class DataSetWrapper(object):
                                               transforms.RandomHorizontalFlip(),
                                               transforms.RandomApply([color_jitter], p=0.8),
                                               transforms.RandomGrayscale(p=0.2),
-                                              GaussianBlur(kernel_size=int(0.1 * self.input_shape[0])),
+                                              GaussianBlur(kernel_size=check_for_kernelsize(int(0.1 * self.input_shape[0]))),
                                               transforms.ToTensor()])
         return data_transforms
 
@@ -95,7 +102,7 @@ class SimpleDataset(Dataset):
         Assuming images are in image_url
         """
         sample = Image.open(self.data[idx]['img_path'])
-        sample = sample.resize((224, 224))
+        # sample = sample.resize((256, 256))
         # sample = cv2.imread(self.data[idx]['img_path'])
         # sample = cv2.resize(sample, (224, 224)) / 255.0
         # sample = np.asarray(sample, dtype=np.float32)
