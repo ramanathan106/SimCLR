@@ -38,7 +38,9 @@ class SimCLR(object):
         self.nt_xent_criterion = NTXentLoss(self.device, config['batch_size'], **config['loss'])
 
     def _get_device(self):
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        gpuid = int(sys.argv[2])
+        # device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        device = torch.device("cuda:{}".format(gpuid))
         print("Running on:", device)
         return device
 
