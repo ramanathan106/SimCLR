@@ -90,6 +90,7 @@ class SimCLR(object):
         optimizer.zero_grad()
 
         for epoch_counter in range(self.config['epochs']):
+            train_loss = 0
             for batch_counter, ((xis, xjs), _) in enumerate(train_loader):
                 if batch_counter % self.config["accumalate"] == 0:
                     optimizer.zero_grad()
@@ -98,6 +99,7 @@ class SimCLR(object):
                 xjs = xjs.to(self.device)
 
                 loss = self._step(model, xis, xjs, n_iter)
+                train_loss += loss
 
                 if n_iter % self.config['log_every_n_steps'] == 0:
                     self.writer.add_scalar('train_loss', loss, global_step=n_iter)
@@ -127,6 +129,8 @@ class SimCLR(object):
             if epoch_counter >= 10:
                 scheduler.step()
             self.writer.add_scalar('cosine_lr_decay', scheduler.get_lr()[0], global_step=n_iter)
+
+            print("epoch: {}   train_loss: {}    valid_loss: {}".format(epoch_counter, train_loss, valid_loss))
 
     def _load_pre_trained_weights(self, model):
         try:
