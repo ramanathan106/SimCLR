@@ -84,9 +84,13 @@ class SimCLR(object):
         valid_n_iter = 0
         best_valid_loss = np.inf
 
+        # for initial
+        optimizer.zero_grad()
+
         for epoch_counter in range(self.config['epochs']):
-            for (xis, xjs), _ in train_loader:
-                optimizer.zero_grad()
+            for batch_counter, ((xis, xjs), _) in enumerate(train_loader):
+                if batch_counter % self.config["accumalate"] == 0:
+                    optimizer.zero_grad()
 
                 xis = xis.to(self.device)
                 xjs = xjs.to(self.device)
@@ -102,7 +106,8 @@ class SimCLR(object):
                 else:
                     loss.backward()
 
-                optimizer.step()
+                if batch_counter % self.config["accumalate"] == 0:
+                    optimizer.step()
                 n_iter += 1
 
             # validate the model if requested

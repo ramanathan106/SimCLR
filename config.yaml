@@ -1,4 +1,5 @@
-batch_size: 512
+batch_size: 128
+accumalate:4
 epochs: 80
 eval_every_n_epochs: 1
 fine_tune_from: None
@@ -12,8 +13,8 @@ model:
 
 dataset:
   s: 1
-  input_shape: (96,96,3)
-  num_workers: 0
+  input_shape: (224,224,3)
+  num_workers: 5
   valid_size: 0.05
 
 loss:
