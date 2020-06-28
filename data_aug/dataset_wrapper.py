@@ -8,6 +8,7 @@ from torch.utils.data.dataset import Dataset
 from PIL import Image, ImageFile
 import pandas as pd
 from tqdm import tqdm
+import sys
 
 
 np.random.seed(0)
@@ -119,5 +120,7 @@ def check_image(img):
             return True
         else:
             raise Exception("error")
+    except KeyboardInterrupt:
+        sys.exit()
     except:
         return False
