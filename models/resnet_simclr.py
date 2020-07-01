@@ -16,9 +16,9 @@ class ResNetSimCLR(nn.Module):
         num_ftrs = resnet.fc.in_features
 
         # key matching
-        temp = nn.Sequential(*list(resnet.children())[:-1])
-        old_keys = ["features." + n for n in list(temp.state_dict().keys())]
-        del temp
+        # temp = nn.Sequential(*list(resnet.children())[:-1])
+        # old_keys = ["features." + n for n in list(temp.state_dict().keys())]
+        # del temp
 
         # model
         names = [n for n in resnet._modules.keys()]
@@ -30,12 +30,12 @@ class ResNetSimCLR(nn.Module):
                 ]
             )
         )
-        # new keys
-        new_keys = list(self.features.state_dict().keys())
-        key_map = {old_keys[i]: new_keys[i] for i, n in enumerate(old_keys)}
-
-        with open("old_to_new.json", 'w') as d:
-            d.write(json.dumps(key_map))
+        # # new keys
+        # new_keys = list(self.features.state_dict().keys())
+        # key_map = {old_keys[i]: new_keys[i] for i, n in enumerate(old_keys)}
+        #
+        # with open("old_to_new.json", 'w') as d:
+        #     d.write(json.dumps(key_map))
 
         # projection MLP
         self.l1 = nn.Linear(num_ftrs, num_ftrs)

@@ -5,6 +5,8 @@ import torch.nn.functional as F
 from loss.nt_xent import NTXentLoss
 import os
 import shutil
+import json
+from collections import OrderedDict
 import sys
 
 apex_support = False
@@ -161,3 +163,8 @@ class SimCLR(object):
             valid_loss /= counter
         model.train()
         return valid_loss
+
+
+def rename_old_to_new_format(model):
+    mapp = json.load(open("/mnt/workhorse/cv/ram/dev_mode/SimCLR/old_to_new.json"))
+    return OrderedDict([(mapp[n], model[n]) for n in list(model.keys()) if n in mapp])
