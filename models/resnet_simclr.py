@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
+from collections import OrderedDict
 import torchvision.models as models
 
 
@@ -13,7 +14,16 @@ class ResNetSimCLR(nn.Module):
         resnet = self._get_basemodel(base_model)
         num_ftrs = resnet.fc.in_features
 
-        self.features = nn.Sequential(*list(resnet.children())[:-1])
+        # self.features = nn.Sequential(*list(resnet.children())[:-1])
+        names = [n for n in resnet._modules.keys()]
+        self.features = nn.Sequential(
+            OrderedDict(
+                [
+                    (names[i], n)
+                    for i, n in enumerate(list(resnet.children())[:-1])
+                ]
+            )
+        )
 
         # projection MLP
         self.l1 = nn.Linear(num_ftrs, num_ftrs)
